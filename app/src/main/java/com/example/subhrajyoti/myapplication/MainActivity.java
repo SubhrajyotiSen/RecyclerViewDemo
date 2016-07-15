@@ -75,56 +75,59 @@ public class MainActivity extends AppCompatActivity implements MultiSelectRecycl
 
     @Override
     public void onItemClicked (int position) {
-
-        toggleSelection(position);
+        if (actionMode!=null)
+            toggleSelection(position);
     }
 
     @Override
     public boolean onItemLongClicked (final int position) {
-        if (actionMode!=null){
+
+        if (actionMode==null) {
+            actionMode = this.startSupportActionMode(new android.support.v7.view.ActionMode.Callback() {
+                @Override
+                public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+                    MenuInflater inflater = mode.getMenuInflater();
+                    inflater.inflate(R.menu.menu, menu);
+                    return true;
+                }
+
+                @Override
+                public boolean onPrepareActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
+                    for (int i = mAdapter.getSelectedItemCount(); i >= 1; i--) {
+                        mArrayList.remove(mArrayList.get(mAdapter.getSelectedItems().get(i - 1)));
+                        Toast.makeText(MainActivity.this, mAdapter.getSelectedItems().get(i - 1) + "", Toast.LENGTH_SHORT).show();
+                    }
+                    mAdapter.notifyDataSetChanged();
+                    mAdapter.clearSelection();
+                    mode.finish();
+                    return true;
+                }
+
+                @Override
+                public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
+                    actionMode = null;
+                    mAdapter.clearSelection();
+                }
+            });
+            mRecyclerView.getChildAt(position).setSelected(true);
             toggleSelection(position);
-            return true;
         }
 
-        actionMode = this.startSupportActionMode(new android.support.v7.view.ActionMode.Callback() {
-            @Override
-            public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
-                MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.menu, menu);
-                return true;
-            }
 
-            @Override
-            public boolean onPrepareActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
-                for (int i = mAdapter.getSelectedItemCount() ; i >= 1; i--) {
-                    mArrayList.remove(mArrayList.get(mAdapter.getSelectedItems().get(i - 1)));
-                    Toast.makeText(MainActivity.this, mAdapter.getSelectedItems().get(i - 1) + "", Toast.LENGTH_SHORT).show();
-                }
-                mAdapter.notifyDataSetChanged();
-                mAdapter.clearSelection();
-                mode.finish();
-                return true;
-            }
-
-            @Override
-            public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
-                actionMode = null;
-                mAdapter.clearSelection();
-            }
-        });
-        mRecyclerView.getChildAt(position).setSelected(true);
-        toggleSelection(position);
         return true;
 
     }
 
     private void toggleSelection(int position) {
         mAdapter.toggleSelection (position);
+
+        if (mAdapter.getSelectedItemCount()==0)
+            actionMode.finish();
 
     }
 
