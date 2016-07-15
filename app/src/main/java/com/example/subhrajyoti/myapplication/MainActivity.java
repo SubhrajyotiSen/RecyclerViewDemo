@@ -14,20 +14,18 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MultiSelectRecyclerViewAdapter.ViewHolder.ClickListener {
 
-    private Toolbar toolbar;
-    android.support.v7.view.ActionMode actionMode;
+
+    private android.support.v7.view.ActionMode actionMode;
 
     private RecyclerView mRecyclerView;
     private MultiSelectRecyclerViewAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
-    private ArrayList<String> mArrayList  = new ArrayList<String>();
+    private ArrayList<String> mArrayList  = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
 
         for (int i = 1; i <= 50; i++) {
@@ -37,11 +35,13 @@ public class MainActivity extends AppCompatActivity implements MultiSelectRecycl
 
         if (toolbar != null) {
             setSupportActionBar(toolbar);
-            getSupportActionBar().setTitle("MultiSelectRecylcerView");
+            if (getSupportActionBar()!=null)
+                getSupportActionBar().setTitle("MultiSelectRecyclerView");
 
         }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        assert mRecyclerView != null;
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new MultiSelectRecyclerViewAdapter (MainActivity.this,mArrayList,this);
